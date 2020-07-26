@@ -6,12 +6,13 @@
 package Model;
 
 import Controller.BookDB;
+import java.io.Serializable;
 
 /**
  *
  * @author tran phu phat
  */
-public class Order {
+public class Order implements Serializable{
 
     private Book book;
     private int tQuatity;
@@ -42,7 +43,7 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" + "bID=" + book + ", tQuatity=" + tQuatity + '}';
+        return "" + book.getbName() + " : " + tQuatity + "";
     }
 
 }

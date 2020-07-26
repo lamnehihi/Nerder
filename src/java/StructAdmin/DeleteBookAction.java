@@ -1,0 +1,45 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package StructAdmin;
+
+import Controller.BookDBAdmin;
+
+/**
+ *
+ * @author Admin
+ */
+public class DeleteBookAction {
+
+    private String id;
+
+    private final String SUCCESS = "success";
+    private final String FAIL = "fail";
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public DeleteBookAction() {
+    }
+
+    public String execute() throws Exception {
+        try {
+            String URL = FAIL;
+            boolean result = BookDBAdmin.deleteBook(this.id);
+            if (result) {
+                URL = SUCCESS;
+            }
+            return URL;
+        } catch (Exception e) {
+            return FAIL;
+        }
+    }
+
+}

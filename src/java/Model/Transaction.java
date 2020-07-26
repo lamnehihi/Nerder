@@ -5,8 +5,9 @@
  */
 package Model;
 
+import Controller.TransactionDB;
 import Controller.UserDB;
-import java.time.LocalDate;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +16,17 @@ import java.util.List;
  *
  * @author tran phu phat
  */
-public class Transaction {
+public class Transaction implements Serializable{
     private String tID;
     private User us;
     private List<Order> Cart= new ArrayList<>() ;
     private boolean Status;
     private Date tDate;
-    private Double Total;
+    private Double Total=0.0;
 
+    public Transaction() {
+    }
+            
     public Transaction(String tID, String uID, boolean Status, Date tDate) {
         this.tID = tID;
         this.us = UserDB.getUserById(uID);
@@ -30,6 +34,16 @@ public class Transaction {
         this.tDate = tDate;
         setTotal();
     }
+
+    public Transaction(String uID, boolean Status, Date tDate) {
+        this.tID = TransactionDB.createTransactionID();
+        this.us = UserDB.getUserById(uID);
+        this.Status = Status;
+        this.tDate = tDate;
+        setTotal();
+    }
+    
+    
 
     public String gettID() {
         return tID;
@@ -51,10 +65,11 @@ public class Transaction {
         return Total;
     }
 
-    private void setTotal() {
+    public void setTotal() {
         for (Order order : Cart) {
             this.Total+=(order.getBook().getbPrice()*order.gettQuatity()); 
         }
+        
     }
 
     
@@ -65,6 +80,7 @@ public class Transaction {
 
     public void setCart(List<Order> Cart) {
         this.Cart = Cart;
+        
     }
 
     public boolean isStatus() {
@@ -85,7 +101,7 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transaction{" + "tID=" + tID + ", uID=" + us + ", Cart=" + Cart + ", Status=" + Status + ", tDate=" + tDate + '}';
+        return "[\"" + tID + "\", \"" + us.getuName() + "\", \"" + Cart + "\", \"" + tDate + "\", \"" + Status + "\"]";
     }
 
 }

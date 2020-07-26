@@ -5,11 +5,13 @@
  */
 package Model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Admin
  */
-public class Book {
+public class Book implements Serializable{
     private String bId;
     private String bName;
     private String catId;
@@ -30,6 +32,16 @@ public class Book {
         this.bQuantity = bQuantity;
         this.bAuthor = bAuthor;
         this.bDes = bDes;
+    }
+
+    public Book(String bName, String catId, float bPrice, int bQuantity, String bAuthor, String bDes, String bCover) {
+        this.bName = bName;
+        this.catId = catId;
+        this.bPrice = bPrice;
+        this.bQuantity = bQuantity;
+        this.bAuthor = bAuthor;
+        this.bDes = bDes;
+        this.bCover = bCover;
     }
     
     public Book(String bId, String bName, String catId, float bPrice, int bQuantity, String bAuthor, String bDes, String bCover) {

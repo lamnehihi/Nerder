@@ -34,12 +34,12 @@ public class UserDB {
             PreparedStatement stmt = con.prepareStatement("Select uID, uEmail, uPassword, uName, uPhone, uAddress from Users");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String uID = rs.getString(2);
-                String uEmail = rs.getString(3);
-                String uPassword = rs.getString(4);
-                String uName = rs.getString(5);
-                String uPhone = rs.getString(6);
-                String uAddress = rs.getString(1);
+                String uID = rs.getString(1);
+                String uEmail = rs.getString(2);
+                String uPassword = rs.getString(3);
+                String uName = rs.getString(4);
+                String uPhone = rs.getString(5);
+                String uAddress = rs.getString(6);
                 s = new User(uID, uEmail, uPassword, uName, uPhone, uAddress);
                 list.add(s);
             }
@@ -51,23 +51,23 @@ public class UserDB {
         }
     }
 
-    public static String addNewUser(String uID, String uEmail, String uPassword, String uName, String uPhone, String uAddress) {
+    public static boolean addNewUser(User s) {
         try {
             Class.forName(driverName);
             Connection con = DriverManager.getConnection(dbURL, userDB, passDB);
-            PreparedStatement stmt = con.prepareStatement("Insert Into Users(uID, uEmail, uPassword, uName, uPhone, uAddress) Values(?,?,?,?,?,?) ");
-            stmt.setString(1, uID);
-            stmt.setString(2, uEmail);
-            stmt.setString(3, uPassword);
-            stmt.setString(4, uName);
-            stmt.setString(5, uPhone);
-            stmt.setString(6, uAddress);
+            PreparedStatement stmt = con.prepareStatement("Insert Into Users(uEmail, uPassword, uName, uPhone, uAddress) Values(?,?,?,?,?) ");
+            stmt.setString(1, s.getuEmail());
+            stmt.setString(2, s.getuPassword());
+            stmt.setString(3, s.getuName());
+            stmt.setString(4, s.getuPhone());
+            stmt.setString(5, s.getuAddress());
             stmt.execute();
             con.close();
+            return true;
         } catch (Exception ex) {
             Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        return null;
     }
 
     public static boolean updateUser(User s) {
@@ -85,7 +85,7 @@ public class UserDB {
             int rc = stmt.executeUpdate();
             //if(rc==1) con.commit(); else con.rollback();
             con.close();
-            return rc == 1;
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,15 +96,16 @@ public class UserDB {
         User s = null;
         try (Connection con = DriverManager.getConnection(dbURL, userDB, passDB)) {
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("Select uEmail,uPassword,uName,uPhone,uAddress from Users where uID='" + uID + "'");
+            ResultSet rs = stmt.executeQuery("Select uEmail,uPassword,uName,uPhone,uAddress,uRole from Users where uID='" + uID + "'");
             if (rs.next()) {
                 String uEmail = rs.getString(1);
                 String uPassword = rs.getString(2);
                 String uName = rs.getString(3);
                 String uPhone = rs.getString(4);
                 String uAddress = rs.getString(5);
+                int uRole = rs.getInt(6);
                 String userID = uID;
-                s = new User(userID, uEmail, uPassword, uName, uPhone, uAddress);
+                s = new User(userID, uEmail, uPassword, uName, uPhone, uAddress,uRole);
             }
             con.close();
             return s;
@@ -118,15 +119,16 @@ public class UserDB {
         User s = null;
         try (Connection con = DriverManager.getConnection(dbURL, userDB, passDB)) {
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("Select uID,uEmail,uPassword,uPhone,uAddress from Users where uName='" + uName + "'");
+            ResultSet rs = stmt.executeQuery("Select uID,uEmail,uPassword,uPhone,uAddress, uRole from Users where uName='" + uName + "'");
             if (rs.next()) {
                 String uID = rs.getString(1);
                 String uEmail = rs.getString(2);
                 String uPassword = rs.getString(3);
                 String uPhone = rs.getString(4);
                 String uAddress = rs.getString(5);
+                int uRole = rs.getInt(6);
                 String userName = uName;
-                s = new User(uID, uEmail, uPassword, userName, uPhone, uAddress);
+                s = new User(uID, uEmail, uPassword, userName, uPhone, uAddress, uRole);
             }
             con.close();
             return s;
@@ -137,7 +139,6 @@ public class UserDB {
     }
 
     public static String LogIn(String email, String password) {
-        /*
         try {
             Class.forName(driverName);
             Connection con = DriverManager.getConnection(dbURL, userDB, passDB);
@@ -155,8 +156,6 @@ public class UserDB {
             System.out.println(ex);
         }
         return null;
-         */
-        return "success";
     }
 
     public static void main(String[] args) {
@@ -166,8 +165,8 @@ public class UserDB {
 //        System.out.println("=   =   =   =   =   =   =   =   =   =       =   =   =   =   =   =   ==");
 //        
 //        
-//        User s = new User("U0006", "aaaa@xxxxx.x", "acdd", "ssd", "1425555", "Ha Noi");
-//        UserDB.updateUser(s);
+        User s = new User("U0014", "aaaa@xxxxx.x", "acdd", "ssd", "1425555", "Ha Noi");
+        System.out.println("update : " + UserDB.updateUser(s));
 //        
 //        
 //        System.out.println("=   =   =   =   =   =   =   =   =   =       =   =   =   =   =   =   ==");

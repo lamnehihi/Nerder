@@ -7,6 +7,7 @@ package Controller;
 
 import Model.*;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,7 +80,7 @@ public class TransactionDB implements DatabaseInfo {
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                System.out.println(rs.getString(2));
+
                 result.add(new TransactionforDB(rs.getString(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getBoolean(5), rs.getDate(6)));
             }
             con.close();
@@ -118,6 +120,9 @@ public class TransactionDB implements DatabaseInfo {
                 result.add(temp);
             }
 
+        }
+        for (Transaction r : result) {
+            r.setTotal();
         }
         //System.out.println(result.size()+"after");
         return result;
@@ -168,6 +173,7 @@ public class TransactionDB implements DatabaseInfo {
             ArrayList<Transaction> ls = getBytID(tID);
             //if(ls.isEmpty())System.out.println("null  2 "+tID);
             for (Transaction temp : ls) {
+                System.out.println("1" + temp.gettID());
                 result.add(temp);
             }
         }
@@ -258,7 +264,7 @@ public class TransactionDB implements DatabaseInfo {
         for (TransactionforDB tran : list) {
             try (Connection con = DriverManager.getConnection(dbURL, userDB, passDB)) {
                 PreparedStatement stmt = con.prepareStatement("insert into Transactions(tID,uID,bID,tQuantity,status,tDate) values(?,?,?,?,?,getdate())");
-                stmt.setString(1, createTransactionID());
+                stmt.setString(1, tran.gettID());
                 stmt.setString(2, tran.getuID());
                 stmt.setString(3, tran.getbID());
                 stmt.setInt(4, tran.gettQuatity());
@@ -276,18 +282,39 @@ public class TransactionDB implements DatabaseInfo {
         //return false;
     }
 
-    public void ChangeStatus(String tID) {
+    public boolean ChangeStatus(String tID) {
         try {
             Class.forName(driverName);
             int rc;
+            TransactionDB db = new TransactionDB();
+            ArrayList<Transaction> ls = db.getBytID(tID);
             try (Connection con = DriverManager.getConnection(dbURL, userDB, passDB)) {
-                PreparedStatement stmt = con.prepareStatement("Update Transactions set status=1 where tID= ?");
-                stmt.setString(1, tID);
+                PreparedStatement stmt = con.prepareStatement("Update Transactions set status=? where tID= ?");
+                if (ls.get(0).isStatus()) {
+                    stmt.setInt(1, 0);
+                } else {
+                    stmt.setInt(1, 1);
+                }
+                stmt.setString(2, tID);
                 rc = stmt.executeUpdate();
             }
-            if(rc==0 ) throw new Exception("Change Status failed");
+            if (rc == 0) {
+                throw new Exception("Change Status failed");
+            }
+            return true;
         } catch (Exception e) {
             System.out.println(e);
+            return false;
         }
     }
+
+    public static void main(String[] args) {
+        TransactionDB db = new TransactionDB();
+        ArrayList<Transaction> ls = db.getAll();
+        for (Transaction l : ls) {
+            System.out.println(l.getTotal());
+        }
+        Date d = new Date(Calendar.getInstance().getTime().getTime());
+        Transaction t = new Transaction("U001", false, d);
+   }
 }
